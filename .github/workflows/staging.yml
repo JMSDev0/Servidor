@@ -1,0 +1,28 @@
+name: CI - Staging
+
+on:
+  push:
+    branches:
+      - staging
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Baixar código
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalar dependências
+        run: pip install -r requirements.txt
+
+      - name: Rodar testes
+        run: pytest -v
+
+      - name: Build Docker
+        run: docker build -t minha-api .

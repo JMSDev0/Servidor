@@ -1,0 +1,22 @@
+.env
+*__pycache__
+venv
+
+# Python build and distribution files
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+*.egg-info/
+*.egg
+
+# Testing and coverage tools
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Local IDE configuration folders
+.vscode/
+.idea/

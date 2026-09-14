@@ -1,0 +1,52 @@
+name: CI/CD - Production
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Baixar código
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalar dependências
+        run: pip install -r requirements.txt
+
+      - name: Rodar testes
+        run: pytest -v
+
+      - name: Build Docker
+        run: docker build -t minha-api .
+
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Configurar chave SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/github_actions_deploy
+          chmod 600 ~/.ssh/github_actions_deploy
+
+      - name: Deploy na VM
+        run: |
+          ssh \
+            -i ~/.ssh/github_actions_deploy \
+            -o StrictHostKeyChecking=no \
+            ${{ vars.VM_USER }}@${{ vars.VM_HOST }} \
+            "
+              cd /home/ubuntu/backend/api-acmoveis &&
+              git pull origin master &&
+              docker compose up -d --build
+            "
